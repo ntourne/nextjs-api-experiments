@@ -20,13 +20,15 @@ export default function Home({ createdAt, name }: Props) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        <div className={styles.description}>
-          The test is being done with these values:
-          <ul>
-            <li>name: {`"${name}"`}</li>
-            <li>last time updated: {`"${createdAt}"`}</li>
-          </ul>
-        </div>
+        {createdAt ? (
+          <div className={styles.description}>
+            The test is being done with these values:
+            <ul>
+              <li>name: {`"${name}"`}</li>
+              <li>last time updated: {`"${createdAt}"`}</li>
+            </ul>
+          </div>
+        ) : null}
         <div className={styles.description}>
           <DisplayData />
         </div>
@@ -41,20 +43,34 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
     "public, s-maxage=900, stale-while-revalidate=21600"
   );
 
-  const name = "home";
+  const defaultName = "home";
 
-  const createdAt = await fetch(
-    `https://nextjs-api-experiments.vercel.app/api/test?name=${name}`
-  )
-    .then((data) => data.json())
-    .then((data) => {
-      return data.createdAt;
-    });
+  const fetchCreatedAt = async (name: string) => {
+    const createdAt = await fetch(
+      `https://nextjs-api-experiments.vercel.app/api/test?name=${name}`
+    )
+      .then((data) => data.json())
+      .then((data) => {
+        if (data) return data.createdAt;
+        return "";
+      })
+      .catch(() => {
+        return "";
+      });
+
+    return createdAt || null;
+  };
+
+  // const createdAt = fetchCreatedAt(defaultName);
+
+  // ["test", "nicolas"].forEach((name) => {
+  //   fetchCreatedAt(name);
+  // });
 
   return {
     props: {
-      createdAt,
-      name,
+      createdAt: null,
+      name: defaultName,
     },
   };
 };

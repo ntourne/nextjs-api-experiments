@@ -9,7 +9,7 @@ const DisplayData: FC = () => {
       return;
     }
 
-    fetch(`/api/test?name=${name}`)
+    fetch(`/api/test-expire?name=${name}`)
       .then((data) => data.json())
       .then((data) => {
         if (data && data.createdAt) {
